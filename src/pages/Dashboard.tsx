@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Trees, Coins } from "lucide-react";
+import { Trees, Coins, BarChart3, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
+import EcoBot from "@/components/EcoBot";
 
 interface Product {
   id: string;
@@ -53,6 +54,10 @@ const Dashboard = () => {
 
   const handleRecycle = () => {
     navigate("/recycle");
+  };
+
+  const handleViewAnalytics = () => {
+    navigate("/analytics");
   };
 
   if (!user) return null;
@@ -171,7 +176,7 @@ const Dashboard = () => {
         </Card>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-3">
           <Button onClick={handleViewWallet} variant="outline" className="h-16 flex-col gap-1">
             <Coins className="h-5 w-5" />
             <span className="text-sm">Eco Wallet</span>
@@ -180,7 +185,14 @@ const Dashboard = () => {
             <Trees className="h-5 w-5" />
             <span className="text-sm">Recycle</span>
           </Button>
+          <Button onClick={handleViewAnalytics} variant="outline" className="h-16 flex-col gap-1">
+            <BarChart3 className="h-5 w-5" />
+            <span className="text-sm">Analytics</span>
+          </Button>
         </div>
+
+        {/* EcoBot Assistant */}
+        <EcoBot />
       </div>
     </div>
   );

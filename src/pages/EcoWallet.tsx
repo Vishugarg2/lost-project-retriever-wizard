@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Coins, Gift, Trees } from "lucide-react";
+import { ArrowLeft, Coins, Gift, Trees, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
+import EcoChart from "@/components/EcoChart";
 
 const EcoWallet = () => {
   const navigate = useNavigate();
@@ -109,6 +110,31 @@ const EcoWallet = () => {
           </CardContent>
         </Card>
 
+        {/* Points Growth Chart */}
+        <EcoChart type="eco-points" />
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-3 gap-4">
+          <Card className="text-center">
+            <CardContent className="pt-4">
+              <div className="text-2xl font-bold text-emerald-600">12</div>
+              <p className="text-xs text-muted-foreground">Swaps Made</p>
+            </CardContent>
+          </Card>
+          <Card className="text-center">
+            <CardContent className="pt-4">
+              <div className="text-2xl font-bold text-emerald-600">{user.co2Saved}kg</div>
+              <p className="text-xs text-muted-foreground">CO₂ Saved</p>
+            </CardContent>
+          </Card>
+          <Card className="text-center">
+            <CardContent className="pt-4">
+              <div className="text-2xl font-bold text-emerald-600">85%</div>
+              <p className="text-xs text-muted-foreground">Goal Progress</p>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Redeem Rewards */}
         <Card>
           <CardHeader>
@@ -170,23 +196,35 @@ const EcoWallet = () => {
         {/* Impact Summary */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Your Impact</CardTitle>
+            <CardTitle className="text-base flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Your Environmental Impact
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-4 text-center">
-              <div>
-                <div className="text-2xl font-bold text-emerald-600">{user.co2Saved}kg</div>
-                <p className="text-xs text-muted-foreground">CO₂ Saved</p>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4 text-center">
+                <div>
+                  <div className="text-2xl font-bold text-emerald-600">{user.co2Saved}kg</div>
+                  <p className="text-xs text-muted-foreground">CO₂ Saved</p>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-emerald-600">12</div>
+                  <p className="text-xs text-muted-foreground">Eco Swaps Made</p>
+                </div>
               </div>
-              <div>
-                <div className="text-2xl font-bold text-emerald-600">12</div>
-                <p className="text-xs text-muted-foreground">Eco Swaps Made</p>
+              <div className="space-y-2">
+                <div className="p-3 bg-emerald-50 rounded-lg">
+                  <p className="text-sm text-emerald-700 text-center">
+                    🌍 That's equivalent to taking a car off the road for {Math.round(user.co2Saved * 2.3)} miles!
+                  </p>
+                </div>
+                <div className="p-3 bg-blue-50 rounded-lg">
+                  <p className="text-sm text-blue-700 text-center">
+                    🌱 You've helped save the equivalent of {Math.round(user.co2Saved * 0.5)} trees worth of CO₂!
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="mt-4 p-3 bg-emerald-50 rounded-lg">
-              <p className="text-sm text-emerald-700 text-center">
-                🌍 That's equivalent to taking a car off the road for {Math.round(user.co2Saved * 2.3)} miles!
-              </p>
             </div>
           </CardContent>
         </Card>

@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import ProductCompare from "./pages/ProductCompare";
 import EcoWallet from "./pages/EcoWallet";
 import Recycle from "./pages/Recycle";
+import Analytics from "./pages/Analytics";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/compare" element={<ProductCompare />} />
           <Route path="/wallet" element={<EcoWallet />} />
           <Route path="/recycle" element={<Recycle />} />
+          <Route path="/analytics" element={<Analytics />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
