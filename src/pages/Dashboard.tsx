@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Trees, Coins, BarChart3, MessageCircle, User } from "lucide-react";
+import { Trees, Coins, BarChart3, MessageCircle, User, ScanLine } from "lucide-react";
 import { toast } from "sonner";
 import EcoBot from "@/components/EcoBot";
+import ProductScanner from "@/components/ProductScanner";
 
 interface Product {
   id: string;
@@ -20,6 +21,7 @@ interface Product {
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
   const [cart, setCart] = useState<Product[]>([]);
+  const [showScanner, setShowScanner] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,6 +60,12 @@ const Dashboard = () => {
 
   const handleViewAnalytics = () => {
     navigate("/analytics");
+  };
+
+  const handleScanComplete = (productData: any) => {
+    setCart(prev => [...prev, productData]);
+    setShowScanner(false);
+    toast.success(`Added ${productData.name} to cart!`);
   };
 
   if (!user) return null;
@@ -180,6 +188,22 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
+        {/* Scan Product Button */}
+        <Card>
+          <CardContent className="pt-6">
+            <Button 
+              onClick={() => setShowScanner(true)} 
+              className="w-full h-16 bg-emerald-600 hover:bg-emerald-700 text-white text-lg font-medium"
+            >
+              <ScanLine className="h-6 w-6 mr-3" />
+              Scan Product
+            </Button>
+            <p className="text-xs text-muted-foreground text-center mt-2">
+              📱 Point camera at barcode to add products
+            </p>
+          </CardContent>
+        </Card>
+
         {/* Quick Actions */}
         <div className="grid grid-cols-3 gap-3">
           <Button onClick={handleViewWallet} variant="outline" className="h-16 flex-col gap-1">
@@ -198,6 +222,14 @@ const Dashboard = () => {
 
         {/* EcoBot Assistant */}
         <EcoBot />
+
+        {/* Product Scanner Modal */}
+        {showScanner && (
+          <ProductScanner 
+            onScanComplete={handleScanComplete}
+            onClose={() => setShowScanner(false)}
+          />
+        )}
       </div>
     </div>
   );
