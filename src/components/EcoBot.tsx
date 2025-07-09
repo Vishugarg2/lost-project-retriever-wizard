@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Send, Bot, User } from "lucide-react";
+import { MessageCircle, Send, Bot, User, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
 
 interface Message {
   id: string;
@@ -18,13 +18,47 @@ const EcoBot = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Hi! I'm EcoBot, your sustainable shopping assistant! 🌱 Ask me about eco-friendly products, green alternatives, or sustainability tips!",
+      text: "Hi! I'm EcoBot, your sustainable shopping assistant! 🌱 Ask me about eco-friendly products, green alternatives, or sustainability tips! Try using voice commands by clicking the mic button!",
       sender: "bot",
       timestamp: new Date(),
     },
   ]);
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const speechSynthesisRef = useRef<SpeechSynthesis | null>(null);
+
+  useEffect(() => {
+    // Check for speech recognition support
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    setSpeechSupported(!!SpeechRecognition && 'speechSynthesis' in window);
+    
+    if (SpeechRecognition) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = 'en-US';
+      
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setInputMessage(transcript);
+        setIsListening(false);
+      };
+      
+      recognitionRef.current.onerror = () => {
+        setIsListening(false);
+      };
+      
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    }
+    
+    speechSynthesisRef.current = window.speechSynthesis;
+  }, []);
 
   const quickQuestions = [
     "What are eco-friendly alternatives to plastic bags?",
@@ -62,6 +96,49 @@ const EcoBot = () => {
     return botResponses.default;
   };
 
+  const startListening = () => {
+    if (recognitionRef.current && speechSupported) {
+      setIsListening(true);
+      recognitionRef.current.start();
+    }
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current && isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  };
+
+  const speakMessage = (text: string) => {
+    if (speechSynthesisRef.current && speechSupported) {
+      speechSynthesisRef.current.cancel(); // Stop any ongoing speech
+      setIsSpeaking(true);
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.9;
+      utterance.pitch = 1;
+      utterance.volume = 0.8;
+      
+      utterance.onend = () => {
+        setIsSpeaking(false);
+      };
+      
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+      };
+      
+      speechSynthesisRef.current.speak(utterance);
+    }
+  };
+
+  const toggleSpeech = () => {
+    if (isSpeaking) {
+      speechSynthesisRef.current?.cancel();
+      setIsSpeaking(false);
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
@@ -73,20 +150,25 @@ const EcoBot = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = inputMessage;
     setInputMessage("");
     setIsTyping(true);
 
     // Simulate bot typing delay
     setTimeout(() => {
+      const botResponse = getBotResponse(currentInput);
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: getBotResponse(inputMessage),
+        text: botResponse,
         sender: "bot",
         timestamp: new Date(),
       };
       
       setMessages(prev => [...prev, botMessage]);
       setIsTyping(false);
+      
+      // Speak the bot response automatically
+      speakMessage(botResponse);
     }, 1500);
   };
 
@@ -186,15 +268,40 @@ const EcoBot = () => {
             </div>
           </div>
 
+          {/* Voice Controls */}
+          {speechSupported && (
+            <div className="px-3 pb-2 flex justify-center gap-2">
+              <Button
+                size="sm"
+                variant={isListening ? "destructive" : "outline"}
+                onClick={isListening ? stopListening : startListening}
+                className="flex items-center gap-1"
+              >
+                {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                {isListening ? "Stop" : "Speak"}
+              </Button>
+              <Button
+                size="sm"
+                variant={isSpeaking ? "destructive" : "outline"}
+                onClick={toggleSpeech}
+                className="flex items-center gap-1"
+              >
+                {isSpeaking ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                {isSpeaking ? "Mute" : "Audio"}
+              </Button>
+            </div>
+          )}
+
           {/* Input */}
           <div className="p-3 border-t">
             <div className="flex gap-2">
               <Input
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Ask about eco products..."
+                placeholder={isListening ? "Listening..." : "Ask about eco products..."}
                 onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
                 className="text-sm"
+                disabled={isListening}
               />
               <Button size="sm" onClick={handleSendMessage} className="bg-emerald-600 hover:bg-emerald-700">
                 <Send className="h-4 w-4" />
