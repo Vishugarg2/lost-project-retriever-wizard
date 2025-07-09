@@ -31,6 +31,8 @@ const EcoBot = () => {
     "How can I reduce my carbon footprint while shopping?",
     "What's the difference between organic and conventional products?",
     "Show me local and sustainable food options",
+    "How do I scan products with EcoSwap?",
+    "What voice commands can I use?",
   ];
 
   const botResponses: { [key: string]: string } = {
@@ -38,6 +40,8 @@ const EcoBot = () => {
     "carbon": "🌍 To reduce your carbon footprint: choose local products (reduces transport emissions), buy seasonal produce, opt for minimal packaging, choose organic when possible, and use our EcoSwap suggestions for lower-carbon alternatives!",
     "organic": "🌱 Organic products are grown without synthetic pesticides, fertilizers, or GMOs. They're better for soil health and biodiversity. Conventional products may have residues but are more affordable. Our eco-score considers both environmental impact and accessibility!",
     "local": "🏪 Local and sustainable options: farmer's markets, local co-ops, community-supported agriculture (CSA), and products with 'locally sourced' labels. Look for items with less than 100 miles of transport - they're fresher and have lower emissions!",
+    "scan": "📱 To scan products: 1) Point your camera at any barcode, 2) Wait for the green scan indicator, 3) View instant eco-alternatives and impact data. You can also use voice commands like 'Hey EcoBot, scan this product' while scanning!",
+    "voice": "🎙️ Voice commands you can use: 'Compare products', 'Show alternatives', 'What's my eco score?', 'Find recycling options', or just ask me anything about sustainable shopping. Just tap and hold the chat button to speak!",
     "hello": "Hello! 👋 I'm here to help you make eco-friendly shopping choices. What would you like to know about sustainable products?",
     "help": "I can help you with: 🌿 Finding eco-friendly alternatives, 📊 Understanding product eco-scores, 🛒 Sustainable shopping tips, ♻️ Recycling guidance, and 💚 Maximizing your environmental impact!",
     "default": "That's an interesting question! 🤔 While I focus on eco-friendly shopping, I'd recommend checking our product comparison tool or browsing eco-certified products. You can also earn points by making sustainable swaps! Is there anything specific about green products you'd like to know?",
@@ -50,6 +54,8 @@ const EcoBot = () => {
     if (message.includes("carbon") || message.includes("footprint")) return botResponses.carbon;
     if (message.includes("organic") || message.includes("conventional")) return botResponses.organic;
     if (message.includes("local") || message.includes("sustainable food")) return botResponses.local;
+    if (message.includes("scan") || message.includes("barcode") || message.includes("camera")) return botResponses.scan;
+    if (message.includes("voice") || message.includes("speak") || message.includes("command")) return botResponses.voice;
     if (message.includes("hello") || message.includes("hi")) return botResponses.hello;
     if (message.includes("help")) return botResponses.help;
     

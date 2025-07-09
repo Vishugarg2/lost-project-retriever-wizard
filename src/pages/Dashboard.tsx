@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Trees, Coins, BarChart3, MessageCircle } from "lucide-react";
+import { Trees, Coins, BarChart3, MessageCircle, User } from "lucide-react";
 import { toast } from "sonner";
 import EcoBot from "@/components/EcoBot";
 
@@ -75,9 +75,14 @@ const Dashboard = () => {
               <Trees className="h-6 w-6 text-emerald-600" />
               <span className="font-bold text-emerald-700">EcoSwap</span>
             </div>
-            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">
-              {user.level}
-            </Badge>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate("/profile")}
+              className="p-2"
+            >
+              <User className="h-5 w-5 text-emerald-600" />
+            </Button>
           </div>
         </div>
       </div>
