@@ -15,6 +15,7 @@ interface Product {
   price: number;
   ecoScore: number;
   co2Footprint: number;
+  carbonPercentage?: string;
   image: string;
 }
 
@@ -149,12 +150,19 @@ const Dashboard = () => {
                   <div key={item.id} className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">{item.image}</span>
-                      <div>
-                        <p className="font-medium text-sm">{item.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          Eco Score: {item.ecoScore}/100 | ${item.price}
-                        </p>
-                      </div>
+                       <div>
+                         <p className="font-medium text-sm">{item.name}</p>
+                         <div className="flex items-center gap-2 text-xs">
+                           <span className="text-muted-foreground">
+                             Eco Score: {item.ecoScore}/100 | ${item.price}
+                           </span>
+                           {item.carbonPercentage && (
+                             <Badge variant="destructive" className="bg-red-100 text-red-700 text-xs px-2 py-0">
+                               🔥 {item.carbonPercentage}% Carbon
+                             </Badge>
+                           )}
+                         </div>
+                       </div>
                     </div>
                     <Button size="sm" onClick={handleSwapProduct} className="bg-emerald-600 hover:bg-emerald-700">
                       Swap

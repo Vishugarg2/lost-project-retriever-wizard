@@ -28,6 +28,7 @@ const ProductScanner = ({ onScanComplete, onClose }: ScannerProps) => {
       
       // Simulate barcode/product recognition
       setTimeout(() => {
+        const carbonPercentage = (Math.random() * 15 + 5).toFixed(1); // 5-20% carbon
         const mockProductData = {
           id: Math.random().toString(),
           name: "Scanned Product",
@@ -35,11 +36,16 @@ const ProductScanner = ({ onScanComplete, onClose }: ScannerProps) => {
           ecoScore: Math.floor(Math.random() * 100),
           price: (Math.random() * 20 + 5).toFixed(2),
           co2Footprint: (Math.random() * 5 + 0.5).toFixed(1),
+          carbonPercentage,
           image: "📦"
         };
         
+        // Show carbon percentage prominently
+        toast.success(`Carbon Footprint: ${carbonPercentage}% detected!`, {
+          description: `Product scanned successfully!`
+        });
+        
         onScanComplete(mockProductData);
-        toast.success("Product scanned successfully!");
         setIsScanning(false);
       }, 2000);
       
@@ -55,6 +61,7 @@ const ProductScanner = ({ onScanComplete, onClose }: ScannerProps) => {
     
     // Simulate scan for web demo
     setTimeout(() => {
+      const carbonPercentage = "12.3"; // Demo carbon percentage
       const mockProductData = {
         id: Math.random().toString(),
         name: "Regular Potato Chips",
@@ -62,11 +69,16 @@ const ProductScanner = ({ onScanComplete, onClose }: ScannerProps) => {
         ecoScore: 35,
         price: "3.99",
         co2Footprint: "2.4",
+        carbonPercentage,
         image: "🥔"
       };
       
+      // Show carbon percentage prominently
+      toast.success(`Carbon Footprint: ${carbonPercentage}% detected!`, {
+        description: `Product scanned successfully!`
+      });
+      
       onScanComplete(mockProductData);
-      toast.success("Product scanned successfully!");
       setIsScanning(false);
     }, 2000);
   };
