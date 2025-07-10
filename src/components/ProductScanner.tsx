@@ -10,9 +10,21 @@ interface ScannerProps {
   onClose: () => void;
 }
 
+interface ScannedProduct {
+  id: string;
+  name: string;
+  barcode: string;
+  ecoScore: number;
+  price: string;
+  co2Footprint: string;
+  carbonPercentage: string;
+  image: string;
+}
+
 const ProductScanner = ({ onScanComplete, onClose }: ScannerProps) => {
   const [isScanning, setIsScanning] = useState(false);
   const [scannedImage, setScannedImage] = useState<string | null>(null);
+  const [scannedProduct, setScannedProduct] = useState<ScannedProduct | null>(null);
 
   const startCamera = async () => {
     try {
@@ -40,13 +52,9 @@ const ProductScanner = ({ onScanComplete, onClose }: ScannerProps) => {
           image: "📦"
         };
         
-        // Show carbon percentage prominently
-        toast.success(`Carbon Footprint: ${carbonPercentage}% detected!`, {
-          description: `Product scanned successfully!`
-        });
-        
-        onScanComplete(mockProductData);
+        setScannedProduct(mockProductData);
         setIsScanning(false);
+        toast.success(`Carbon Footprint: ${carbonPercentage}% detected!`);
       }, 2000);
       
     } catch (error) {
@@ -73,14 +81,23 @@ const ProductScanner = ({ onScanComplete, onClose }: ScannerProps) => {
         image: "🥔"
       };
       
-      // Show carbon percentage prominently
-      toast.success(`Carbon Footprint: ${carbonPercentage}% detected!`, {
-        description: `Product scanned successfully!`
-      });
-      
-      onScanComplete(mockProductData);
+      setScannedProduct(mockProductData);
       setIsScanning(false);
+      toast.success(`Carbon Footprint: ${carbonPercentage}% detected!`);
     }, 2000);
+  };
+
+  const handleAddToCart = () => {
+    if (scannedProduct) {
+      onScanComplete(scannedProduct);
+      toast.success(`Added ${scannedProduct.name} to cart!`);
+      onClose();
+    }
+  };
+
+  const handleScanAnother = () => {
+    setScannedProduct(null);
+    setScannedImage(null);
   };
 
   return (
@@ -103,54 +120,97 @@ const ProductScanner = ({ onScanComplete, onClose }: ScannerProps) => {
             </div>
           )}
           
-          <div className="text-center space-y-4">
-            {isScanning ? (
-              <div className="space-y-3">
-                <div className="w-16 h-16 mx-auto border-4 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-sm text-muted-foreground">
-                  Scanning product... Please wait
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="w-16 h-16 mx-auto bg-emerald-100 rounded-full flex items-center justify-center">
-                  <CameraIcon className="h-8 w-8 text-emerald-600" />
-                </div>
-                <div>
-                  <h3 className="font-medium">Scan Product Barcode</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Point your camera at the product barcode
-                  </p>
+          {scannedProduct ? (
+            // Show scan results
+            <div className="space-y-4">
+              <div className="text-center">
+                <div className="text-6xl mb-2">{scannedProduct.image}</div>
+                <h3 className="font-bold text-lg">{scannedProduct.name}</h3>
+                <div className="flex justify-center mt-3">
+                  <div className="bg-red-100 text-red-700 px-4 py-2 rounded-full border-2 border-red-200">
+                    <span className="text-2xl font-bold">🔥 {scannedProduct.carbonPercentage}%</span>
+                    <p className="text-sm font-medium">Carbon Footprint</p>
+                  </div>
                 </div>
               </div>
-            )}
-          </div>
-          
-          <div className="space-y-2">
-            <Button 
-              onClick={startCamera} 
-              disabled={isScanning}
-              className="w-full bg-emerald-600 hover:bg-emerald-700"
-            >
-              <CameraIcon className="h-4 w-4 mr-2" />
-              {isScanning ? "Scanning..." : "Start Camera Scan"}
-            </Button>
-            
-            <Button 
-              onClick={simulateScan} 
-              disabled={isScanning}
-              variant="outline"
-              className="w-full"
-            >
-              <ScanLine className="h-4 w-4 mr-2" />
-              Demo Scan (Web)
-            </Button>
-          </div>
-          
-          <div className="text-xs text-muted-foreground text-center">
-            📱 On mobile: Use camera to scan barcodes<br/>
-            💻 On web: Use demo scan for testing
-          </div>
+              
+              <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Eco Score:</span>
+                  <span className="font-medium">{scannedProduct.ecoScore}/100</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Price:</span>
+                  <span className="font-medium">${scannedProduct.price}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">CO₂ Footprint:</span>
+                  <span className="font-medium">{scannedProduct.co2Footprint}kg</span>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Button onClick={handleAddToCart} className="w-full bg-emerald-600 hover:bg-emerald-700">
+                  Add to Cart
+                </Button>
+                <Button onClick={handleScanAnother} variant="outline" className="w-full">
+                  Scan Another Product
+                </Button>
+              </div>
+            </div>
+          ) : (
+            // Show scanning interface
+            <>
+              <div className="text-center space-y-4">
+                {isScanning ? (
+                  <div className="space-y-3">
+                    <div className="w-16 h-16 mx-auto border-4 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-sm text-muted-foreground">
+                      Scanning product... Please wait
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="w-16 h-16 mx-auto bg-emerald-100 rounded-full flex items-center justify-center">
+                      <CameraIcon className="h-8 w-8 text-emerald-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Scan Product Barcode</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Point your camera at the product barcode
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div className="space-y-2">
+                <Button 
+                  onClick={startCamera} 
+                  disabled={isScanning}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700"
+                >
+                  <CameraIcon className="h-4 w-4 mr-2" />
+                  {isScanning ? "Scanning..." : "Start Camera Scan"}
+                </Button>
+                
+                <Button 
+                  onClick={simulateScan} 
+                  disabled={isScanning}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <ScanLine className="h-4 w-4 mr-2" />
+                  Demo Scan (Web)
+                </Button>
+              </div>
+              
+              <div className="text-xs text-muted-foreground text-center">
+                📱 On mobile: Use camera to scan barcodes<br/>
+                💻 On web: Use demo scan for testing
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>
