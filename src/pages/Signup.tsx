@@ -42,8 +42,29 @@ const Signup = () => {
       joinDate: new Date().toISOString()
     };
     
+    
     localStorage.setItem("ecoswap_user", JSON.stringify(userData));
-    toast.success("Welcome to EcoSwap! Let's make the world greener together!");
+    
+    // Welcome celebration sequence
+    toast.success("🎉 Welcome to EcoSwap! Your green journey starts now!", {
+      duration: 5000,
+      description: "🌱 Together, we'll make shopping sustainable and fun!"
+    });
+    
+    setTimeout(() => {
+      toast.info("🏆 Achievement Unlocked: Eco Newcomer!", {
+        duration: 4000,
+        description: "🎯 You've earned your first badge for joining the community!"
+      });
+    }, 2000);
+    
+    setTimeout(() => {
+      toast.info("📱 Pro Tip: Use our barcode scanner to find eco-alternatives!", {
+        duration: 4000,
+        description: "🔍 Point your camera at any product to get started!"
+      });
+    }, 4000);
+    
     navigate("/onboarding");
   };
 

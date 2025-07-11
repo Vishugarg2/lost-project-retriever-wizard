@@ -18,7 +18,7 @@ const EcoBot = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Hi! I'm EcoBot, your sustainable shopping assistant! 🌱 Ask me about eco-friendly products, green alternatives, or sustainability tips! Try using voice commands by clicking the mic button!",
+      text: "Hey there, eco-warrior! 🌱✨ I'm EcoBot, your super-friendly sustainable shopping buddy! I'm here to help you save the planet one purchase at a time! 🌍💚 Ask me anything about eco-friendly products, green alternatives, or how to be more sustainable! You can even use voice commands - just click the mic! Ready to make some green magic happen? 🪄🌿",
       sender: "bot",
       timestamp: new Date(),
     },
@@ -61,24 +61,26 @@ const EcoBot = () => {
   }, []);
 
   const quickQuestions = [
-    "What are eco-friendly alternatives to plastic bags?",
-    "How can I reduce my carbon footprint while shopping?",
-    "What's the difference between organic and conventional products?",
-    "Show me local and sustainable food options",
-    "How do I scan products with EcoSwap?",
-    "What voice commands can I use?",
+    "🛍️ What are the best plastic-free alternatives?",
+    "🌍 How can I shop more sustainably?", 
+    "🥗 Show me local & organic food options",
+    "📱 How do I scan products for eco-scores?",
+    "🎯 What's my current eco-impact?",
+    "♻️ Where can I recycle this item?",
   ];
 
   const botResponses: { [key: string]: string } = {
-    "plastic": "Great question! 🛍️ Here are eco-friendly alternatives to plastic bags: reusable canvas bags, jute bags, bamboo fiber bags, and recycled material totes. These can reduce plastic waste by up to 1000 bags per year per person!",
-    "carbon": "🌍 To reduce your carbon footprint: choose local products (reduces transport emissions), buy seasonal produce, opt for minimal packaging, choose organic when possible, and use our EcoSwap suggestions for lower-carbon alternatives!",
-    "organic": "🌱 Organic products are grown without synthetic pesticides, fertilizers, or GMOs. They're better for soil health and biodiversity. Conventional products may have residues but are more affordable. Our eco-score considers both environmental impact and accessibility!",
-    "local": "🏪 Local and sustainable options: farmer's markets, local co-ops, community-supported agriculture (CSA), and products with 'locally sourced' labels. Look for items with less than 100 miles of transport - they're fresher and have lower emissions!",
-    "scan": "📱 To scan products: 1) Point your camera at any barcode, 2) Wait for the green scan indicator, 3) View instant eco-alternatives and impact data. You can also use voice commands like 'Hey EcoBot, scan this product' while scanning!",
-    "voice": "🎙️ Voice commands you can use: 'Compare products', 'Show alternatives', 'What's my eco score?', 'Find recycling options', or just ask me anything about sustainable shopping. Just tap and hold the chat button to speak!",
-    "hello": "Hello! 👋 I'm here to help you make eco-friendly shopping choices. What would you like to know about sustainable products?",
-    "help": "I can help you with: 🌿 Finding eco-friendly alternatives, 📊 Understanding product eco-scores, 🛒 Sustainable shopping tips, ♻️ Recycling guidance, and 💚 Maximizing your environmental impact!",
-    "default": "That's an interesting question! 🤔 While I focus on eco-friendly shopping, I'd recommend checking our product comparison tool or browsing eco-certified products. You can also earn points by making sustainable swaps! Is there anything specific about green products you'd like to know?",
+    "plastic": "Awesome question! 🛍️✨ Here are my fave plastic-free alternatives: stylish reusable canvas bags, trendy jute totes, cool bamboo fiber bags, and chic recycled material carriers! 🌱 Fun fact: Using just one reusable bag can save over 1,000 plastic bags per year! You're basically a planet superhero! 🦸‍♀️💚",
+    "carbon": "Great thinking, eco-champion! 🌍💚 Here's how to slash your carbon footprint: choose local goodies (less transport = happy planet! 🚛➡️🌱), grab seasonal treats, pick minimal packaging, go organic when you can, and definitely use our EcoSwap magic for lower-carbon swaps! Every choice counts! 🎯✨",
+    "organic": "Love this question! 🌱🤔 Organic products are grown without synthetic nasties - no harsh pesticides, fertilizers, or GMOs! They're like a spa treatment for the soil and amazing for biodiversity! 🦋 Conventional products work too and are budget-friendly. Our eco-score considers both planet impact AND your wallet! 💰🌍",
+    "local": "Yes! Supporting local is SO cool! 🏪✨ Try farmer's markets (they're like food festivals! 🥕🎪), local co-ops, community-supported agriculture (CSA), and look for 'locally sourced' labels! Aim for under 100 miles - fresher food, lower emissions, AND you're supporting your neighbors! 🤝💚",
+    "scan": "This is where the magic happens! 📱✨ Just point your camera at ANY barcode, wait for that satisfying green scan indicator, then BOOM! 💥 Instant eco-alternatives and impact data! Pro tip: try saying 'Hey EcoBot, scan this!' while scanning - I love voice commands! 🎙️🌟",
+    "voice": "I LOVE talking with you! 🎙️💬 Try these fun commands: 'Compare products', 'Show alternatives', 'What's my eco score?', 'Find recycling options', or just chat naturally! Tap and hold the chat button to speak - it's like having a green bestie in your pocket! 💚📱",
+    "hello": "Hello there, amazing human! 👋✨ I'm absolutely thrilled to help you make the world greener, one awesome choice at a time! What sustainable adventure shall we go on today? 🌱🚀",
+    "help": "I'm your eco-superhero sidekick! 🦸‍♀️💚 I can help you discover amazing eco-friendly alternatives 🌿, understand those important eco-scores 📊, share the coolest sustainable shopping secrets 🛒✨, guide you through recycling like a pro ♻️, and help you maximize your planet-saving superpowers! 💪🌍",
+    "recycle": "Recycling rockstar mode activated! ♻️🌟 I can help you find the perfect recycling spots for any item! Just tell me what you need to recycle, and I'll point you to the nearest facilities. Many items like electronics, batteries, and textiles need special recycling centers - but I've got you covered! 🎯💚",
+    "score": "Your eco-score is looking fantastic! 🏆✨ It measures your environmental impact based on product choices, recycling habits, and sustainable swaps. The higher the score, the more you're helping our beautiful planet! Keep up the amazing work, eco-warrior! 🌱💪",
+    "default": "Ooh, that's a fascinating question! 🤔✨ While I'm totally obsessed with eco-friendly shopping (it's my superpower! 💚), I'd love to point you toward our amazing product comparison tool or our collection of eco-certified goodies! Plus, you can earn awesome points by making planet-friendly swaps! 🏆 Is there anything specific about green products that's got you curious? 🌱🔍",
   };
 
   const getBotResponse = (userMessage: string): string => {
@@ -90,8 +92,10 @@ const EcoBot = () => {
     if (message.includes("local") || message.includes("sustainable food")) return botResponses.local;
     if (message.includes("scan") || message.includes("barcode") || message.includes("camera")) return botResponses.scan;
     if (message.includes("voice") || message.includes("speak") || message.includes("command")) return botResponses.voice;
-    if (message.includes("hello") || message.includes("hi")) return botResponses.hello;
+    if (message.includes("hello") || message.includes("hi") || message.includes("hey")) return botResponses.hello;
     if (message.includes("help")) return botResponses.help;
+    if (message.includes("recycle") || message.includes("recycling")) return botResponses.recycle;
+    if (message.includes("score") || message.includes("eco score") || message.includes("impact")) return botResponses.score;
     
     return botResponses.default;
   };
@@ -186,9 +190,9 @@ const EcoBot = () => {
         >
           <MessageCircle className="h-6 w-6" />
         </Button>
-        <Badge className="absolute -top-2 -left-2 bg-red-500 text-white">
-          EcoBot
-        </Badge>
+         <Badge className="absolute -top-2 -left-2 bg-emerald-500 text-white animate-pulse">
+           🌱 EcoBot
+         </Badge>
       </div>
     );
   }
@@ -200,7 +204,7 @@ const EcoBot = () => {
           <div className="flex items-center justify-between">
             <CardTitle className="text-base flex items-center gap-2">
               <Bot className="h-5 w-5 text-emerald-600" />
-              EcoBot Assistant
+              EcoBot 🌱 Your Green Assistant
             </CardTitle>
             <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>
               ×
@@ -298,7 +302,7 @@ const EcoBot = () => {
               <Input
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder={isListening ? "Listening..." : "Ask about eco products..."}
+                placeholder={isListening ? "🎙️ Listening..." : "Ask about eco products... 🌱"}
                 onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
                 className="text-sm"
                 disabled={isListening}

@@ -31,7 +31,18 @@ const Login = () => {
     };
     
     localStorage.setItem("ecoswap_user", JSON.stringify(userData));
-    toast.success("Welcome back to EcoSwap!");
+    toast.success("🌟 Welcome back to EcoSwap! Your sustainable journey continues!", {
+      duration: 4000,
+      description: "🎯 You're ready to make eco-friendly choices that matter!"
+    });
+    
+    // Welcome back notification
+    setTimeout(() => {
+      toast.info("💡 Tip: Check out today's featured eco-friendly products!", {
+        duration: 3000
+      });
+    }, 2000);
+    
     navigate("/dashboard");
   };
 
