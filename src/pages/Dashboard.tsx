@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Trees, Coins, BarChart3, MessageCircle, User, ScanLine } from "lucide-react";
+import { Trees, Coins, BarChart3, MessageCircle, User, ScanLine, ShoppingCart, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import EcoBot from "@/components/EcoBot";
 import ProductScanner from "@/components/ProductScanner";
@@ -23,6 +23,7 @@ const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
   const [cart, setCart] = useState<Product[]>([]);
   const [showScanner, setShowScanner] = useState(false);
+  const [showCartDetails, setShowCartDetails] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -69,6 +70,23 @@ const Dashboard = () => {
     toast.success(`Added ${productData.name} to cart!`);
   };
 
+  const handlePayment = () => {
+    if (cart.length === 0) {
+      toast.error("Your cart is empty!");
+      return;
+    }
+    
+    const total = cart.reduce((sum, item) => sum + item.price, 0);
+    toast.success(`Payment of $${total.toFixed(2)} processed successfully!`);
+    setCart([]);
+    setShowCartDetails(false);
+  };
+
+  const removeFromCart = (productId: string) => {
+    setCart(prev => prev.filter(item => item.id !== productId));
+    toast.success("Item removed from cart");
+  };
+
   if (!user) return null;
 
   const monthlyGoal = 50; // kg CO2
@@ -84,14 +102,29 @@ const Dashboard = () => {
               <Trees className="h-6 w-6 text-emerald-600" />
               <span className="font-bold text-emerald-700">EcoSwap</span>
             </div>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate("/profile")}
-              className="p-2"
-            >
-              <User className="h-5 w-5 text-emerald-600" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setShowCartDetails(true)}
+                className="p-2 relative"
+              >
+                <ShoppingCart className="h-5 w-5 text-emerald-600" />
+                {cart.length > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full text-xs p-0 bg-red-500 text-white flex items-center justify-center">
+                    {cart.length}
+                  </Badge>
+                )}
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => navigate("/profile")}
+                className="p-2"
+              >
+                <User className="h-5 w-5 text-emerald-600" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -141,7 +174,19 @@ const Dashboard = () => {
         {/* Current Cart */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Your Shopping Cart</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">Your Shopping Cart</CardTitle>
+              {cart.length > 0 && (
+                <Button 
+                  onClick={handlePayment} 
+                  size="sm" 
+                  className="bg-emerald-600 hover:bg-emerald-700"
+                >
+                  <CreditCard className="h-4 w-4 mr-1" />
+                  Pay ${cart.reduce((sum, item) => sum + item.price, 0).toFixed(2)}
+                </Button>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             {cart.length > 0 ? (
@@ -164,9 +209,19 @@ const Dashboard = () => {
                          </div>
                        </div>
                     </div>
-                    <Button size="sm" onClick={handleSwapProduct} className="bg-emerald-600 hover:bg-emerald-700">
-                      Swap
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button size="sm" onClick={handleSwapProduct} className="bg-emerald-600 hover:bg-emerald-700">
+                        Swap
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="destructive" 
+                        onClick={() => removeFromCart(item.id)}
+                        className="text-xs px-2"
+                      >
+                        ✕
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -237,6 +292,77 @@ const Dashboard = () => {
             onScanComplete={handleScanComplete}
             onClose={() => setShowScanner(false)}
           />
+        )}
+
+        {/* Cart Details Modal */}
+        {showCartDetails && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <Card className="w-full max-w-md max-h-[80vh] overflow-y-auto">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg">Shopping Cart ({cart.length})</CardTitle>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setShowCartDetails(false)}
+                    className="p-2"
+                  >
+                    ✕
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {cart.length > 0 ? (
+                  <div className="space-y-4">
+                    {cart.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">{item.image}</span>
+                          <div>
+                            <p className="font-medium text-sm">{item.name}</p>
+                            <div className="flex items-center gap-2 text-xs">
+                              <span className="text-muted-foreground">
+                                Eco Score: {item.ecoScore}/100 | ${item.price}
+                              </span>
+                              {item.carbonPercentage && (
+                                <Badge variant="destructive" className="bg-red-100 text-red-700 text-xs px-2 py-0">
+                                  🔥 {item.carbonPercentage}% Carbon
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <Button 
+                          size="sm" 
+                          variant="destructive" 
+                          onClick={() => removeFromCart(item.id)}
+                          className="text-xs px-2"
+                        >
+                          ✕
+                        </Button>
+                      </div>
+                    ))}
+                    <div className="border-t pt-4">
+                      <div className="flex justify-between items-center mb-4">
+                        <span className="font-bold">Total: ${cart.reduce((sum, item) => sum + item.price, 0).toFixed(2)}</span>
+                      </div>
+                      <Button 
+                        onClick={handlePayment} 
+                        className="w-full bg-emerald-600 hover:bg-emerald-700"
+                      >
+                        <CreditCard className="h-4 w-4 mr-2" />
+                        Proceed to Payment
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-center text-muted-foreground py-8">
+                    Your cart is empty
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         )}
       </div>
     </div>
