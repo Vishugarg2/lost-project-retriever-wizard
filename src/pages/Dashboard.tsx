@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Trees, Coins, BarChart3, MessageCircle, User, ScanLine, ShoppingCart, CreditCard } from "lucide-react";
+import { Trees, Coins, BarChart3, MessageCircle, User, ScanLine, ShoppingCart, CreditCard, Smartphone, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import EcoBot from "@/components/EcoBot";
 import ProductScanner from "@/components/ProductScanner";
@@ -24,6 +24,8 @@ const Dashboard = () => {
   const [cart, setCart] = useState<Product[]>([]);
   const [showScanner, setShowScanner] = useState(false);
   const [showCartDetails, setShowCartDetails] = useState(false);
+  const [showPaymentModes, setShowPaymentModes] = useState(false);
+  const [selectedPaymentMode, setSelectedPaymentMode] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,7 +41,7 @@ const Dashboard = () => {
       {
         id: "1",
         name: "Regular Potato Chips",
-        price: 3.99,
+        price: 299, // Changed to INR
         ecoScore: 35,
         co2Footprint: 2.4,
         image: "🥔"
@@ -75,17 +77,31 @@ const Dashboard = () => {
       toast.error("Your cart is empty!");
       return;
     }
-    
+    setShowPaymentModes(true);
+  };
+
+  const processPayment = (paymentMode: string) => {
     const total = cart.reduce((sum, item) => sum + item.price, 0);
-    toast.success(`Payment of $${total.toFixed(2)} processed successfully!`);
+    toast.success(`Payment of ₹${total.toFixed(2)} processed successfully via ${paymentMode}!`);
     setCart([]);
     setShowCartDetails(false);
+    setShowPaymentModes(false);
+    setSelectedPaymentMode("");
   };
 
   const removeFromCart = (productId: string) => {
     setCart(prev => prev.filter(item => item.id !== productId));
     toast.success("Item removed from cart");
   };
+
+  const paymentModes = [
+    { id: "phonepe", name: "PhonePe", icon: "📱", color: "bg-purple-100 text-purple-700" },
+    { id: "googlepay", name: "Google Pay", icon: "💳", color: "bg-blue-100 text-blue-700" },
+    { id: "paytm", name: "Paytm", icon: "💰", color: "bg-indigo-100 text-indigo-700" },
+    { id: "upi", name: "UPI", icon: "🏦", color: "bg-green-100 text-green-700" },
+    { id: "creditcard", name: "Credit Card", icon: "💳", color: "bg-orange-100 text-orange-700" },
+    { id: "debitcard", name: "Debit Card", icon: "💳", color: "bg-red-100 text-red-700" },
+  ];
 
   if (!user) return null;
 
@@ -183,7 +199,7 @@ const Dashboard = () => {
                   className="bg-emerald-600 hover:bg-emerald-700"
                 >
                   <CreditCard className="h-4 w-4 mr-1" />
-                  Pay ${cart.reduce((sum, item) => sum + item.price, 0).toFixed(2)}
+                  Pay ₹{cart.reduce((sum, item) => sum + item.price, 0).toFixed(2)}
                 </Button>
               )}
             </div>
@@ -199,7 +215,7 @@ const Dashboard = () => {
                          <p className="font-medium text-sm">{item.name}</p>
                          <div className="flex items-center gap-2 text-xs">
                            <span className="text-muted-foreground">
-                             Eco Score: {item.ecoScore}/100 | ${item.price}
+                             Eco Score: {item.ecoScore}/100 | ₹{item.price}
                            </span>
                            {item.carbonPercentage && (
                              <Badge variant="destructive" className="bg-red-100 text-red-700 text-xs px-2 py-0">
@@ -322,7 +338,7 @@ const Dashboard = () => {
                             <p className="font-medium text-sm">{item.name}</p>
                             <div className="flex items-center gap-2 text-xs">
                               <span className="text-muted-foreground">
-                                Eco Score: {item.ecoScore}/100 | ${item.price}
+                                Eco Score: {item.ecoScore}/100 | ₹{item.price}
                               </span>
                               {item.carbonPercentage && (
                                 <Badge variant="destructive" className="bg-red-100 text-red-700 text-xs px-2 py-0">
@@ -344,14 +360,14 @@ const Dashboard = () => {
                     ))}
                     <div className="border-t pt-4">
                       <div className="flex justify-between items-center mb-4">
-                        <span className="font-bold">Total: ${cart.reduce((sum, item) => sum + item.price, 0).toFixed(2)}</span>
+                        <span className="font-bold">Total: ₹{cart.reduce((sum, item) => sum + item.price, 0).toFixed(2)}</span>
                       </div>
                       <Button 
                         onClick={handlePayment} 
                         className="w-full bg-emerald-600 hover:bg-emerald-700"
                       >
                         <CreditCard className="h-4 w-4 mr-2" />
-                        Proceed to Payment
+                        Choose Payment Method
                       </Button>
                     </div>
                   </div>
@@ -360,6 +376,53 @@ const Dashboard = () => {
                     Your cart is empty
                   </p>
                 )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Payment Modes Modal */}
+        {showPaymentModes && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <Card className="w-full max-w-md">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg">Choose Payment Method</CardTitle>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setShowPaymentModes(false)}
+                    className="p-2"
+                  >
+                    ✕
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Total: ₹{cart.reduce((sum, item) => sum + item.price, 0).toFixed(2)}
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-3">
+                  {paymentModes.map((mode) => (
+                    <Button
+                      key={mode.id}
+                      variant="outline"
+                      className={`h-20 flex-col gap-2 ${selectedPaymentMode === mode.id ? 'ring-2 ring-emerald-500' : ''}`}
+                      onClick={() => {
+                        setSelectedPaymentMode(mode.id);
+                        setTimeout(() => processPayment(mode.name), 500);
+                      }}
+                    >
+                      <span className="text-2xl">{mode.icon}</span>
+                      <span className="text-xs font-medium">{mode.name}</span>
+                    </Button>
+                  ))}
+                </div>
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                  <p className="text-xs text-blue-700">
+                    💡 All payments are secure and encrypted. Choose your preferred payment method.
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </div>
