@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { MessageCircle, Send, Bot, User, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
+import { saveBotMessage, getBotHistory, getCurrentUser } from "@/lib/supabase";
+import { toast } from "sonner";
 
 interface Message {
   id: string;
@@ -28,6 +30,7 @@ const EcoBot = () => {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const recognitionRef = useRef<any>(null);
   const speechSynthesisRef = useRef<SpeechSynthesis | null>(null);
 
@@ -46,10 +49,12 @@ const EcoBot = () => {
         const transcript = event.results[0][0].transcript;
         setInputMessage(transcript);
         setIsListening(false);
+        toast.success("🎙️ Voice captured: " + transcript);
       };
       
       recognitionRef.current.onerror = () => {
         setIsListening(false);
+        toast.error("Voice recognition failed. Please try again.");
       };
       
       recognitionRef.current.onend = () => {
@@ -58,7 +63,43 @@ const EcoBot = () => {
     }
     
     speechSynthesisRef.current = window.speechSynthesis;
+    
+    // Load user and message history
+    loadUserAndHistory();
   }, []);
+
+  const loadUserAndHistory = async () => {
+    try {
+      const user = await getCurrentUser();
+      setCurrentUser(user);
+      
+      if (user) {
+        const { data: history } = await getBotHistory(user.id);
+        if (history && history.length > 0) {
+          const loadedMessages: Message[] = [];
+          
+          history.forEach((msg: any) => {
+            loadedMessages.push({
+              id: msg.id,
+              text: msg.message,
+              sender: 'user',
+              timestamp: new Date(msg.created_at)
+            });
+            loadedMessages.push({
+              id: msg.id + '_bot',
+              text: msg.response,
+              sender: 'bot',
+              timestamp: new Date(msg.created_at)
+            });
+          });
+          
+          setMessages(prev => [...prev, ...loadedMessages]);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error);
+    }
+  };
 
   const quickQuestions = [
     "🛍️ What are the best plastic-free alternatives?",
@@ -155,11 +196,12 @@ const EcoBot = () => {
 
     setMessages(prev => [...prev, userMessage]);
     const currentInput = inputMessage;
+    const isVoiceInput = isListening;
     setInputMessage("");
     setIsTyping(true);
 
     // Simulate bot typing delay
-    setTimeout(() => {
+    setTimeout(async () => {
       const botResponse = getBotResponse(currentInput);
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -170,6 +212,15 @@ const EcoBot = () => {
       
       setMessages(prev => [...prev, botMessage]);
       setIsTyping(false);
+      
+      // Save to Supabase if user is logged in
+      if (currentUser) {
+        try {
+          await saveBotMessage(currentUser.id, currentInput, botResponse, isVoiceInput);
+        } catch (error) {
+          console.error('Error saving message:', error);
+        }
+      }
       
       // Speak the bot response automatically
       speakMessage(botResponse);

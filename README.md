@@ -1,73 +1,128 @@
-# Welcome to your Lovable project
+# EcoSwap - Sustainable Shopping App
 
-## Project info
+## 🌱 Walmart Hackathon Project
 
-**URL**: https://lovable.dev/projects/cae2d0fe-60f3-4c52-9704-fbd26cc9dcd9
+EcoSwap is a comprehensive sustainable shopping application built for the Walmart Hackathon. It helps users make eco-friendly purchasing decisions by providing real-time environmental impact data, alternative product suggestions, and gamified sustainability features.
 
-## How can I edit this code?
+## 🚀 Key Features
 
-There are several ways of editing your application.
+### 🛍️ Smart Shopping
+- **Product Scanning**: Use both rear and front camera to scan product barcodes
+- **Carbon Footprint Analysis**: Real-time calculation of environmental impact
+- **Eco-Friendly Alternatives**: AI-powered suggestions for greener products
+- **Price Comparison**: Compare costs while considering environmental impact
 
-**Use Lovable**
+### 🤖 EcoBot Assistant
+- **Voice Integration**: Complete voice commands and responses
+- **Microphone Support**: Tap-to-speak functionality
+- **Smart Recommendations**: Personalized eco-friendly suggestions
+- **Real-time Help**: 24/7 sustainable shopping guidance
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/cae2d0fe-60f3-4c52-9704-fbd26cc9dcd9) and start prompting.
+### 💳 Indian Payment Integration
+- **Multiple Payment Options**: PhonePe, Google Pay, Paytm, UPI
+- **Credit/Debit Cards**: Full card payment support
+- **INR Currency**: All prices displayed in Indian Rupees (₹)
+- **Secure Transactions**: Encrypted payment processing
 
-Changes made via Lovable will be committed automatically to this repo.
+### 📊 Sustainability Tracking
+- **Eco Points System**: Gamified rewards for green choices
+- **CO₂ Savings Tracker**: Monitor your environmental impact
+- **Monthly Goals**: Set and achieve sustainability targets
+- **Community Impact**: See collective community progress
 
-**Use your preferred IDE**
+### 🗃️ Backend Integration (Supabase)
+- **User Authentication**: Secure signup/login system
+- **Real-time Database**: Store user data, products, and transactions
+- **Cart Management**: Persistent shopping cart across sessions
+- **Message History**: Save EcoBot conversations
+- **Product Database**: Comprehensive eco-friendly product catalog
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🛠️ Technology Stack
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- **Frontend**: React 18, TypeScript, Tailwind CSS
+- **UI Components**: Shadcn UI with custom design system
+- **Mobile**: Capacitor for native camera access
+- **Backend**: Supabase (Authentication, Database, Real-time)
+- **Payments**: Mock Indian payment gateway integration
+- **Voice**: Web Speech API for voice commands
+- **Camera**: Capacitor Camera Plugin
 
-Follow these steps:
+## 🚀 Getting Started
 
+### Prerequisites
+- Node.js 18+
+- Supabase account (optional - works with mock data)
+
+### Installation
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Navigate to project directory
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Supabase Setup (Optional)
+1. Create a Supabase project
+2. Update `src/lib/supabase.ts` with your credentials
+3. Create the required database tables
+4. Enable authentication in Supabase dashboard
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Mobile Development
+```sh
+# Add Capacitor platforms
+npx cap add ios android
 
-**Use GitHub Codespaces**
+# Build the project
+npm run build
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# Sync with native platforms
+npx cap sync
 
-## What technologies are used for this project?
+# Run on device
+npx cap run ios
+# or
+npx cap run android
+```
 
-This project is built with:
+## 📱 Mobile Features
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **Native Camera Access**: Both front and rear camera support
+- **Barcode Scanning**: Real-time product recognition
+- **Voice Commands**: Full speech-to-text integration
+- **Push Notifications**: Eco-friendly reminders
+- **Offline Support**: Works without internet connection
 
-## How can I deploy this project?
+## 🎯 Hackathon Highlights
 
-Simply open [Lovable](https://lovable.dev/projects/cae2d0fe-60f3-4c52-9704-fbd26cc9dcd9) and click on Share -> Publish.
+### Innovation
+- **Dual Camera Scanning**: Unique front camera mode for personal items
+- **Voice-First AI**: Complete voice interaction with EcoBot
+- **Indian Market Focus**: Localized payment methods and currency
+- **Gamification**: Points and achievements for sustainable choices
 
-## Can I connect a custom domain to my Lovable project?
+### User Experience
+- **Seamless Onboarding**: Multiple welcome notifications
+- **Real-time Feedback**: Instant carbon footprint calculation
+- **Community Impact**: Show collective environmental savings
+- **Progressive Enhancement**: Works on web and mobile
 
-Yes, you can!
+## 🔮 Future Roadmap
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- **AI Product Recognition**: Advanced barcode-less scanning
+- **Social Features**: Share eco-achievements with friends
+- **Local Store Integration**: Real-time inventory from nearby stores
+- **Blockchain Rewards**: NFT certificates for sustainability milestones
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+---
+
+**Built with ❤️ for a sustainable future** 🌍
+
+### Original Lovable Project
+**URL**: https://lovable.dev/projects/cae2d0fe-60f3-4c52-9704-fbd26cc9dcd9

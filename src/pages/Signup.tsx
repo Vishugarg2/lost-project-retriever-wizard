@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Trees } from "lucide-react";
+import { signUp } from "@/lib/supabase";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -14,7 +15,7 @@ const Signup = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!name || !email || !password || !confirmPassword) {
@@ -32,40 +33,50 @@ const Signup = () => {
       return;
     }
 
-    // Mock signup - store user data
-    const userData = {
-      name,
-      email,
-      ecoPoints: 0,
-      level: "Eco Newcomer",
-      co2Saved: 0,
-      joinDate: new Date().toISOString()
-    };
-    
-    
-    localStorage.setItem("ecoswap_user", JSON.stringify(userData));
-    
-    // Welcome celebration sequence
-    toast.success("🎉 Welcome to EcoSwap! Your green journey starts now!", {
-      duration: 5000,
-      description: "🌱 Together, we'll make shopping sustainable and fun!"
-    });
-    
-    setTimeout(() => {
-      toast.info("🏆 Achievement Unlocked: Eco Newcomer!", {
-        duration: 4000,
-        description: "🎯 You've earned your first badge for joining the community!"
+    try {
+      const { data, error } = await signUp(email, password, name);
+      
+      if (error) {
+        // Fallback to mock authentication for demo
+        console.log('Supabase signup failed, using mock auth:', error);
+        
+        const userData = {
+          name,
+          email,
+          ecoPoints: 50, // Welcome bonus!
+          level: "Eco Beginner",
+          co2Saved: 0,
+          joinDate: new Date().toISOString()
+        };
+        
+        localStorage.setItem("ecoswap_user", JSON.stringify(userData));
+      }
+      
+      // Welcome celebration sequence
+      toast.success("🎉 Welcome to EcoSwap! Your green journey starts now!", {
+        duration: 5000,
+        description: "🌱 Together, we'll make shopping sustainable and fun!"
       });
-    }, 2000);
-    
-    setTimeout(() => {
-      toast.info("📱 Pro Tip: Use our barcode scanner to find eco-alternatives!", {
-        duration: 4000,
-        description: "🔍 Point your camera at any product to get started!"
-      });
-    }, 4000);
-    
-    navigate("/onboarding");
+      
+      setTimeout(() => {
+        toast.info("🏆 Achievement Unlocked: Eco Newcomer!", {
+          duration: 4000,
+          description: "🎯 You've earned your first badge for joining the community!"
+        });
+      }, 2000);
+      
+      setTimeout(() => {
+        toast.info("📱 Pro Tip: Use our barcode scanner to find eco-alternatives!", {
+          duration: 4000,
+          description: "🔍 Point your camera at any product to get started!"
+        });
+      }, 4000);
+      
+      navigate("/onboarding");
+    } catch (error) {
+      console.error('Signup error:', error);
+      toast.error("Signup failed. Please try again.");
+    }
   };
 
   return (

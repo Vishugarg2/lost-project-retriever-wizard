@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Camera, CameraResultType } from '@capacitor/camera';
+import { Camera, CameraResultType, CameraSource, CameraDirection } from '@capacitor/camera';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ScanLine, Camera as CameraIcon, X } from 'lucide-react';
+import { ScanLine, Camera as CameraIcon, X, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
+import { addProduct, getCurrentUser, addToCart } from '@/lib/supabase';
 
 interface ScannerProps {
   onScanComplete: (productData: any) => void;
@@ -26,35 +27,59 @@ const ProductScanner = ({ onScanComplete, onClose }: ScannerProps) => {
   const [scannedImage, setScannedImage] = useState<string | null>(null);
   const [scannedProduct, setScannedProduct] = useState<ScannedProduct | null>(null);
 
-  const startCamera = async () => {
+  const startCamera = async (useFrontCamera: boolean = false) => {
     try {
       setIsScanning(true);
       
       const image = await Camera.getPhoto({
         quality: 90,
         allowEditing: false,
-        resultType: CameraResultType.DataUrl
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Camera,
+        direction: useFrontCamera ? CameraDirection.Front : CameraDirection.Rear
       });
 
       setScannedImage(image.dataUrl || null);
       
       // Simulate barcode/product recognition
-      setTimeout(() => {
+      setTimeout(async () => {
         const carbonPercentage = (Math.random() * 15 + 5).toFixed(1); // 5-20% carbon
+        const barcode = `${Math.floor(Math.random() * 1000000000)}`;
+        const price = Math.floor(Math.random() * 500 + 50); // ₹50-₹550
+        
         const mockProductData = {
           id: Math.random().toString(),
-          name: "Scanned Product",
-          barcode: "123456789",
+          name: useFrontCamera ? "Front Camera Scanned Item" : "Scanned Product",
+          barcode,
           ecoScore: Math.floor(Math.random() * 100),
-          price: (Math.random() * 20 + 5).toFixed(2),
+          price: price.toString(),
           co2Footprint: (Math.random() * 5 + 0.5).toFixed(1),
           carbonPercentage,
-          image: "📦"
+          image: useFrontCamera ? "🤳" : "📦"
         };
+        
+        // Save to Supabase
+        try {
+          const user = await getCurrentUser();
+          if (user) {
+            await addProduct({
+              name: mockProductData.name,
+              barcode: mockProductData.barcode,
+              price: parseInt(mockProductData.price),
+              eco_score: mockProductData.ecoScore,
+              co2_footprint: parseFloat(mockProductData.co2Footprint),
+              carbon_percentage: mockProductData.carbonPercentage,
+              image: mockProductData.image,
+              category: useFrontCamera ? 'selfie_scan' : 'barcode_scan'
+            });
+          }
+        } catch (error) {
+          console.error('Error saving product:', error);
+        }
         
         setScannedProduct(mockProductData);
         setIsScanning(false);
-        toast.success(`Carbon Footprint: ${carbonPercentage}% detected!`);
+        toast.success(`${useFrontCamera ? '🤳 Front camera' : '📷 Rear camera'} scan complete! Carbon: ${carbonPercentage}%`);
       }, 2000);
       
     } catch (error) {
@@ -87,8 +112,18 @@ const ProductScanner = ({ onScanComplete, onClose }: ScannerProps) => {
     }, 2000);
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (scannedProduct) {
+      try {
+        const user = await getCurrentUser();
+        if (user) {
+          // Add to Supabase cart
+          await addToCart(user.id, scannedProduct.id);
+        }
+      } catch (error) {
+        console.error('Error adding to cart:', error);
+      }
+      
       onScanComplete(scannedProduct);
       toast.success(`Added ${scannedProduct.name} to cart!`);
       onClose();
@@ -186,12 +221,21 @@ const ProductScanner = ({ onScanComplete, onClose }: ScannerProps) => {
               
               <div className="space-y-2">
                 <Button 
-                  onClick={startCamera} 
+                  onClick={() => startCamera(false)} 
                   disabled={isScanning}
                   className="w-full bg-emerald-600 hover:bg-emerald-700"
                 >
                   <CameraIcon className="h-4 w-4 mr-2" />
-                  {isScanning ? "Scanning..." : "Start Camera Scan"}
+                  {isScanning ? "Scanning..." : "Rear Camera Scan"}
+                </Button>
+                
+                <Button 
+                  onClick={() => startCamera(true)} 
+                  disabled={isScanning}
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                >
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  {isScanning ? "Scanning..." : "Front Camera Scan"}
                 </Button>
                 
                 <Button 
@@ -206,8 +250,9 @@ const ProductScanner = ({ onScanComplete, onClose }: ScannerProps) => {
               </div>
               
               <div className="text-xs text-muted-foreground text-center">
-                📱 On mobile: Use camera to scan barcodes<br/>
-                💻 On web: Use demo scan for testing
+                📱 Rear Camera: Scan product barcodes<br/>
+                🤳 Front Camera: Scan personal items<br/>
+                💻 Demo: Test scanning functionality
               </div>
             </>
           )}

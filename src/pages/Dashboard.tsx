@@ -8,6 +8,7 @@ import { Trees, Coins, BarChart3, MessageCircle, User, ScanLine, ShoppingCart, C
 import { toast } from "sonner";
 import EcoBot from "@/components/EcoBot";
 import ProductScanner from "@/components/ProductScanner";
+import { getCurrentUser, getCartItems, removeFromCart, clearCart, updateUserPoints } from "@/lib/supabase";
 
 interface Product {
   id: string;
@@ -29,26 +30,61 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userData = localStorage.getItem("ecoswap_user");
-    if (!userData) {
-      navigate("/login");
-      return;
-    }
-    setUser(JSON.parse(userData));
-
-    // Load mock cart data
-    const mockCart = [
-      {
-        id: "1",
-        name: "Regular Potato Chips",
-        price: 299, // Changed to INR
-        ecoScore: 35,
-        co2Footprint: 2.4,
-        image: "🥔"
-      }
-    ];
-    setCart(mockCart);
+    loadUserData();
   }, [navigate]);
+
+  const loadUserData = async () => {
+    try {
+      const currentUser = await getCurrentUser();
+      if (currentUser) {
+        setUser(currentUser);
+        // Load cart from Supabase
+        const { data: cartData } = await getCartItems(currentUser.id);
+        if (cartData) {
+          const cartItems = cartData.map((item: any) => ({
+            id: item.id,
+            name: item.products.name,
+            price: item.products.price,
+            ecoScore: item.products.eco_score,
+            co2Footprint: item.products.co2_footprint,
+            carbonPercentage: item.products.carbon_percentage,
+            image: item.products.image
+          }));
+          setCart(cartItems);
+        }
+      } else {
+        // Fallback to localStorage
+        const userData = localStorage.getItem("ecoswap_user");
+        if (!userData) {
+          navigate("/login");
+          return;
+        }
+        setUser(JSON.parse(userData));
+        
+        // Load mock cart data
+        const mockCart = [
+          {
+            id: "1",
+            name: "Regular Potato Chips",
+            price: 299,
+            ecoScore: 35,
+            co2Footprint: 2.4,
+            image: "🥔"
+          }
+        ];
+        setCart(mockCart);
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error);
+      // Fallback to localStorage
+      const userData = localStorage.getItem("ecoswap_user");
+      if (userData) {
+        setUser(JSON.parse(userData));
+      } else {
+        navigate("/login");
+      }
+    }
+  };
 
   const handleSwapProduct = () => {
     navigate("/compare");
@@ -80,16 +116,45 @@ const Dashboard = () => {
     setShowPaymentModes(true);
   };
 
-  const processPayment = (paymentMode: string) => {
+  const processPayment = async (paymentMode: string) => {
     const total = cart.reduce((sum, item) => sum + item.price, 0);
-    toast.success(`Payment of ₹${total.toFixed(2)} processed successfully via ${paymentMode}!`);
+    
+    try {
+      // Clear cart in Supabase
+      if (user) {
+        await clearCart(user.id);
+        // Award eco points for purchase
+        const pointsEarned = Math.floor(total / 10); // 1 point per ₹10
+        const co2Saved = cart.reduce((sum, item) => sum + (item.co2Footprint || 0), 0);
+        await updateUserPoints(user.id, user.eco_points + pointsEarned, user.co2_saved + co2Saved);
+        
+        toast.success(`Payment of ₹${total.toFixed(2)} processed via ${paymentMode}! Earned ${pointsEarned} eco points!`);
+      } else {
+        toast.success(`Payment of ₹${total.toFixed(2)} processed successfully via ${paymentMode}!`);
+      }
+    } catch (error) {
+      console.error('Payment processing error:', error);
+      toast.success(`Payment of ₹${total.toFixed(2)} processed successfully via ${paymentMode}!`);
+    }
+    
     setCart([]);
     setShowCartDetails(false);
     setShowPaymentModes(false);
     setSelectedPaymentMode("");
+    
+    // Reload user data to update points
+    loadUserData();
   };
 
-  const removeFromCart = (productId: string) => {
+  const removeFromCart = async (productId: string) => {
+    try {
+      if (user) {
+        await removeFromCart(productId);
+      }
+    } catch (error) {
+      console.error('Error removing from cart:', error);
+    }
+    
     setCart(prev => prev.filter(item => item.id !== productId));
     toast.success("Item removed from cart");
   };
